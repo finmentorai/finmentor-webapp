@@ -4,8 +4,8 @@ import { Address } from 'viem'
 
 export async function getOrCreateUser(
   dynamicUserId: string,
-  wallet: Address,
-  username: string,
+  appWallet: Address,
+  extWallet?: Address,
 ): Promise<User | null> {
   let user: User | null
   try {
@@ -19,9 +19,8 @@ export async function getOrCreateUser(
       user = await prisma.user.create({
         data: {
           id: dynamicUserId,
-          wallet,
-          username,
-          displayName: username,
+          appWallet,
+          extWallet,
         },
       })
     }

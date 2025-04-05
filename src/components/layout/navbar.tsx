@@ -16,14 +16,14 @@ export type MenuItemType = {
 
 const MENU_ITEMS: MenuItemType[] = [
   {
-    displayText: 'bounties',
-    href: 'https://ethglobal.com/events/bangkok/prizes#polygon',
+    displayText: 'learn',
+    href: '/learn',
     isExternal: true,
     isMobileOnly: false,
   },
   {
-    displayText: 'repo',
-    href: 'https://github.com/Dablclub/hackathon-starter',
+    displayText: 'marketplace',
+    href: '/marketplace',
     isExternal: true,
     isMobileOnly: false,
   },
@@ -40,7 +40,7 @@ export default function Navbar() {
         <div className="relative">
           <Link className="absolute -top-12 flex w-24 items-center" href="/">
             <Image
-              src="/images/logos/dabl-club-logo-black.png"
+              src="/images/logos/finmentor-logo.png"
               alt="Dabl Club logo"
               width={128}
               height={128}

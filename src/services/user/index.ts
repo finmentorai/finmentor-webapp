@@ -2,8 +2,9 @@ import { Address } from 'viem'
 
 export async function fetchUserAccount(
   dynamicUserId: string,
-  wallet: Address,
-  username: string,
+  appWallet: Address,
+  extWallet?: Address,
+  email?: string,
 ) {
   try {
     const response = await fetch('/api/user', {
@@ -13,8 +14,9 @@ export async function fetchUserAccount(
       },
       body: JSON.stringify({
         dynamicUserId,
-        wallet,
-        username,
+        appWallet,
+        extWallet,
+        email,
       }),
     })
 

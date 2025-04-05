@@ -7,14 +7,15 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:tPJVwqKTHTtHHnYQIcsPREkDCniClWxi@nozomi.proxy.rlwy.net:45573/railway"
 }
 
 model User {
     id                      String                  @id @default(uuid())
-    wallet                  String                  @unique
-    username                String                  @unique
-    displayName             String
+    appWallet               String                  @unique
+    extWallet               String?
+    username                String?
+    displayName             String?
     bio                     String?
     avatarUrl               String?
     bannerUrl               String?
@@ -22,5 +23,5 @@ model User {
     createdAt               DateTime                @default(now())
     updatedAt               DateTime                @updatedAt
 
-    @@index([wallet, username, displayName])
+    @@index([appWallet, extWallet, username])
 }

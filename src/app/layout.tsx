@@ -13,8 +13,8 @@ const fontSans = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Polygon Hackathon Starter by Dabl Club',
-  description: 'Get a head start on your hack with Polygon',
+  title: 'Finmentor - Learn, Discover, and Grow in Finance',
+  description: 'Finmentor is a platform for learning and growing in finance.',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 }
 

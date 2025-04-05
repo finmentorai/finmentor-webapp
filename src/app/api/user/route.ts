@@ -2,7 +2,7 @@ import { getOrCreateUser } from '@/helpers/getOrCreateUser'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const { dynamicUserId, wallet, username } = await req.json()
+  const { dynamicUserId, appWallet, extWallet } = await req.json()
   if (!dynamicUserId) {
     return NextResponse.json(
       { error: 'dynamicUserId is required' },
@@ -10,7 +10,11 @@ export async function POST(req: NextRequest) {
     )
   }
   try {
-    const userAccount = await getOrCreateUser(dynamicUserId, wallet, username)
+    const userAccount = await getOrCreateUser(
+      dynamicUserId,
+      appWallet,
+      extWallet,
+    )
 
     return NextResponse.json(
       {
