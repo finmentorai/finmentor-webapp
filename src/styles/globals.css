@@ -85,7 +85,7 @@
   }
 
   .container {
-    @apply flex w-full max-w-3xl flex-col items-center px-4 sm:px-6 lg:max-w-7xl lg:px-8;
+    @apply flex w-full max-w-3xl flex-col items-center px-4 sm:px-6 lg:max-w-4xl lg:px-8;
   }
 
   h1 {

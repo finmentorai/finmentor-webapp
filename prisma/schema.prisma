@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:tPJVwqKTHTtHHnYQIcsPREkDCniClWxi@nozomi.proxy.rlwy.net:45573/railway"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -23,5 +23,157 @@ model User {
     createdAt               DateTime                @default(now())
     updatedAt               DateTime                @updatedAt
 
+    // Relations
+    terms                   Term[]
+    news                    News[]
+    bids                    Bid[]
+    auctions                Auction[]
+    impressions             Impression[]
+    clicks                  Click[]
+
     @@index([appWallet, extWallet, username])
+}
+
+model Term {
+    id                      String                  @id @default(uuid())
+    name                    String                  @unique
+    link                    String
+    logoUrl                 String?
+    description             String
+    content                 String                  @db.Text
+    startingBidPrice        Float                   @default(0.0)
+    
+    createdAt               DateTime                @default(now())
+    updatedAt               DateTime                @updatedAt
+    
+    // Relations
+    creator                 User                    @relation(fields: [creatorId], references: [id])
+    creatorId               String
+    news                    News[]
+    auctions                Auction[]
+    bids                    Bid[]
+    impressions             Impression[]
+    clicks                  Click[]
+    
+    @@index([name])
+}
+
+model News {
+    id                      String                  @id @default(uuid())
+    title                   String
+    link                    String
+    imageUrl                String?
+    description             String
+    
+    createdAt               DateTime                @default(now())
+    updatedAt               DateTime                @updatedAt
+    
+    // Relations
+    term                    Term                    @relation(fields: [termId], references: [id])
+    termId                  String
+    creator                 User                    @relation(fields: [creatorId], references: [id])
+    creatorId               String
+    auctions                Auction[]
+    bids                    Bid[]
+    impressions             Impression[]
+    clicks                  Click[]
+    
+    @@index([termId])
+}
+
+model Auction {
+    id                      String                  @id @default(uuid())
+    status                  AuctionStatus           @default(ACTIVE)
+    startDate               DateTime                @default(now())
+    endDate                 DateTime?
+    dailyBudget             Float                   @default(0.0)
+    totalBudget             Float
+    spentBudget             Float                   @default(0.0)
+    
+    createdAt               DateTime                @default(now())
+    updatedAt               DateTime                @updatedAt
+    
+    // Relations
+    creator                 User                    @relation(fields: [creatorId], references: [id])
+    creatorId               String
+    term                    Term?                   @relation(fields: [termId], references: [id])
+    termId                  String?
+    news                    News?                   @relation(fields: [newsId], references: [id])
+    newsId                  String?
+    bids                    Bid[]
+    impressions             Impression[]
+    clicks                  Click[]
+    
+    @@index([status, termId, newsId])
+}
+
+model Bid {
+    id                      String                  @id @default(uuid())
+    amount                  Float
+    status                  BidStatus               @default(ACTIVE)
+    maxBid                  Float
+    
+    createdAt               DateTime                @default(now())
+    updatedAt               DateTime                @updatedAt
+    
+    // Relations
+    bidder                  User                    @relation(fields: [bidderId], references: [id])
+    bidderId                String
+    auction                 Auction                 @relation(fields: [auctionId], references: [id])
+    auctionId               String
+    term                    Term?                   @relation(fields: [termId], references: [id])
+    termId                  String?
+    news                    News?                   @relation(fields: [newsId], references: [id])
+    newsId                  String?
+    
+    @@index([status, auctionId])
+}
+
+model Impression {
+    id                      String                  @id @default(uuid())
+    timestamp               DateTime                @default(now())
+    
+    // Relations
+    user                    User?                   @relation(fields: [userId], references: [id])
+    userId                  String?
+    term                    Term?                   @relation(fields: [termId], references: [id])
+    termId                  String?
+    news                    News?                   @relation(fields: [newsId], references: [id])
+    newsId                  String?
+    auction                 Auction?                @relation(fields: [auctionId], references: [id])
+    auctionId               String?
+    
+    @@index([userId, termId, newsId, auctionId])
+}
+
+model Click {
+    id                      String                  @id @default(uuid())
+    timestamp               DateTime                @default(now())
+    
+    // Relations
+    user                    User?                   @relation(fields: [userId], references: [id])
+    userId                  String?
+    term                    Term?                   @relation(fields: [termId], references: [id])
+    termId                  String?
+    news                    News?                   @relation(fields: [newsId], references: [id])
+    newsId                  String?
+    auction                 Auction?                @relation(fields: [auctionId], references: [id])
+    auctionId               String?
+    
+    @@index([userId, termId, newsId, auctionId])
+}
+
+enum AuctionStatus {
+    ACTIVE
+    PAUSED
+    COMPLETED
+    CANCELLED
+}
+
+enum BidStatus {
+    ACTIVE
+    OUTBID
+    WON
+    LOST
+    CANCELLED
 }
