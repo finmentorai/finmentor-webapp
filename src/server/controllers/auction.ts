@@ -124,6 +124,23 @@ export class AuctionController {
     }
   }
 
+  async getAllActiveAuctions(req: NextApiRequest, res: NextApiResponse) {
+    try {
+      const auctions = await this.auctionService.getAllActiveAuctions()
+      res.status(200).json({
+        success: true,
+        data: auctions,
+      })
+    } catch (error) {
+      console.error('Fetch all active auctions error:', error)
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch all active auctions',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+    }
+  }
+
   /**
    * Get top bids for a specific auction
    */
@@ -191,29 +208,29 @@ export class AuctionController {
   }
 }
 
-// Export route handler
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const controller = new AuctionController()
+// // Export route handler
+// export default function handler(req: NextApiRequest, res: NextApiResponse) {
+//   const controller = new AuctionController()
 
-  switch (req.method) {
-    case 'POST':
-      if (req.query.action === 'createAuction') {
-        return controller.createAuction(req, res)
-      } else if (req.query.action === 'placeBid') {
-        return controller.placeBid(req, res)
-      } else if (req.query.action === 'updateAuctionStatus') {
-        return controller.updateAuctionStatus(req, res)
-      }
-      break
-    case 'GET':
-      if (req.query.action === 'activeAuctions') {
-        return controller.getActiveAuctions(req, res)
-      } else if (req.query.action === 'topBids') {
-        return controller.getTopBids(req, res)
-      }
-      break
-    default:
-      res.setHeader('Allow', ['POST', 'GET'])
-      res.status(405).end(`Method ${req.method} Not Allowed`)
-  }
-}
+//   switch (req.method) {
+//     case 'POST':
+//       if (req.query.action === 'createAuction') {
+//         return controller.createAuction(req, res)
+//       } else if (req.query.action === 'placeBid') {
+//         return controller.placeBid(req, res)
+//       } else if (req.query.action === 'updateAuctionStatus') {
+//         return controller.updateAuctionStatus(req, res)
+//       }
+//       break
+//     case 'GET':
+//       if (req.query.action === 'activeAuctions') {
+//         return controller.getActiveAuctions(req, res)
+//       } else if (req.query.action === 'topBids') {
+//         return controller.getTopBids(req, res)
+//       }
+//       break
+//     default:
+//       res.setHeader('Allow', ['POST', 'GET'])
+//       res.status(405).end(`Method ${req.method} Not Allowed`)
+//   }
+// }

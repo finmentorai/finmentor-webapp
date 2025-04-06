@@ -1,26 +1,28 @@
 'use client'
 
-import type { ActiveAuction } from '@/hooks/useActiveAuctions'
-import { useActiveAuctions } from '@/hooks/useActiveAuctions'
+import type { Auction, Bid, News, Term } from '@prisma/client'
+import {
+  useAllActiveAuctions,
+  type ActiveAuction,
+} from '@/hooks/useActiveAuctions'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { BidButton } from './bid-button'
 
 interface ActiveAuctionsListProps {
   termId?: string
   newsId?: string
 }
 
-export function ActiveAuctionsList({
-  termId,
-  newsId,
-}: ActiveAuctionsListProps) {
+export function ActiveAuctionsList({}: ActiveAuctionsListProps) {
   const {
-    data: auctions,
+    data: response,
     isLoading,
     error,
-  } = useActiveAuctions({ termId, newsId })
+    refetch: refetchBids,
+  } = useAllActiveAuctions()
 
   if (isLoading)
     return (
@@ -41,6 +43,8 @@ export function ActiveAuctionsList({
       </Alert>
     )
 
+  const auctions = response?.data as ActiveAuction[]
+
   if (!auctions?.length)
     return (
       <Alert>
@@ -51,21 +55,45 @@ export function ActiveAuctionsList({
   return (
     <div className="space-y-4">
       {auctions.map((auction) => (
-        <AuctionCard key={auction.auctionId} auction={auction} />
+        <AuctionCard
+          key={auction.id}
+          auction={auction}
+          refetchBids={refetchBids}
+        />
       ))}
     </div>
   )
 }
 
 interface AuctionCardProps {
-  auction: ActiveAuction
+  auction: Auction & {
+    bids: Bid[]
+    term: Term
+    news: News
+  }
+  refetchBids: () => void
 }
 
-function AuctionCard({ auction }: AuctionCardProps) {
+function AuctionCard({ auction, refetchBids }: AuctionCardProps) {
+  const currentBid =
+    auction.bids.length > 0
+      ? Math.max(...auction.bids.map((bid) => bid.amount))
+      : auction.dailyBudget
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Auction {auction.auctionId}</CardTitle>
+        <CardTitle className="flex justify-between">
+          {auction.term ? auction.term.name : auction.news?.title}
+          <div>
+            <BidButton
+              auctionId={auction.id}
+              termId={auction.termId ?? ''}
+              className="w-full" // optional
+              refetchBids={refetchBids}
+            />
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
@@ -73,19 +101,23 @@ function AuctionCard({ auction }: AuctionCardProps) {
             <p className="text-sm font-medium text-muted-foreground">
               Current Bid
             </p>
-            <p className="text-2xl font-bold">${auction.bidAmount}</p>
+            <p className="text-2xl font-bold">${currentBid}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Score</p>
-            <p className="text-2xl font-bold">{auction.score.toFixed(2)}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Daily Budget
+            </p>
+            <p className="text-2xl font-bold">${auction.dailyBudget}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Views</p>
-            <p className="text-2xl font-bold">{auction.impressionCount}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Budget
+            </p>
+            <p className="text-2xl font-bold">${auction.totalBudget}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Clicks</p>
-            <p className="text-2xl font-bold">{auction.clickCount}</p>
+            <p className="text-sm font-medium text-muted-foreground">Spent</p>
+            <p className="text-2xl font-bold">${auction.spentBudget}</p>
           </div>
         </div>
       </CardContent>

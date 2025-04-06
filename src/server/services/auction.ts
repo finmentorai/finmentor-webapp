@@ -89,19 +89,21 @@ export class AuctionService {
         status: AuctionStatus.ACTIVE,
         OR: [{ termId: params.termId }, { newsId: params.newsId }],
       },
-      select: {
-        id: true,
-        termId: true,
-        newsId: true,
-        bids: {
-          select: { amount: true },
-        },
-        impressions: {
-          select: { id: true },
-        },
-        clicks: {
-          select: { id: true },
-        },
+      include: {
+        bids: true,
+        impressions: true,
+        clicks: true,
+      },
+    })
+  }
+
+  async getAllActiveAuctions() {
+    return this.prisma.auction.findMany({
+      where: { status: AuctionStatus.ACTIVE },
+      include: {
+        bids: true,
+        term: true,
+        news: true,
       },
     })
   }

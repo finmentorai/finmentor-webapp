@@ -18,13 +18,11 @@ const MENU_ITEMS: MenuItemType[] = [
   {
     displayText: 'learn',
     href: '/learn',
-    isExternal: true,
     isMobileOnly: false,
   },
   {
     displayText: 'marketplace',
     href: '/marketplace',
-    isExternal: true,
     isMobileOnly: false,
   },
   { displayText: 'faq', href: '/faq', isMobileOnly: false },

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { getActiveAuctions } from '@/services/auctions'
-import type { AuctionScore } from '@/server/services/auctionRanking'
+import type { Auction, Bid, News, Term } from '@prisma/client'
+import { getActiveAuctions, getAllActiveAuctions } from '@/services/auctions'
 
 interface UseActiveAuctionsParams {
   termId?: string
@@ -21,5 +21,16 @@ export function useActiveAuctions({
   })
 }
 
+export function useAllActiveAuctions() {
+  return useQuery({
+    queryKey: ['allActiveAuctions'],
+    queryFn: () => getAllActiveAuctions(),
+  })
+}
+
 // Type helper for components
-export type ActiveAuction = AuctionScore
+export type ActiveAuction = Auction & {
+  bids: Bid[]
+  term: Term
+  news: News
+}
